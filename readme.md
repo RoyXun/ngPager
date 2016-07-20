@@ -14,7 +14,7 @@
 
 ## 典型用法
 
-[demo](demo.html)
+[demo](xunqilong.com/demos/ng/ngPager.html)
 
 ```html
 <rx-pager page="page" page-size="pageSize" total="total" paging-action="pageAction(page, pageSize, total)">
