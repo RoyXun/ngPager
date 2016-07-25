@@ -244,7 +244,7 @@ angular.module('rx.pager', []).directive('rxPager', function () {
      * @param {Object} scope - The local directive scope object
      */
     function addRange(start, finish, scope) {
-        for (let i = start; i <= finish; i++) {
+        for (var i = start; i <= finish; i++) {
             scope.List.push({
               value: i,
               liClass: scope.page == i ? scope.options.activeClass : '',
