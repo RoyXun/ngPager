@@ -12,7 +12,7 @@
 
 ##典型用法##
 
-[demo](http://xunqilong.com/ngPager/index.html)
+[live demo及用法](http://xunqilong.com/ngPager/index.html)
 
 ```html
 <rx-pager page="page" page-size="pageSize" total="total" paging-action="paing(page, pageSize, total)"></rx-pager>
