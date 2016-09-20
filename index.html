@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="myApp">
+<head>
+    <meta charset="UTF-8">
+    <title>ngPager demo</title>
+    <link href="http://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body ng-controller="myCtrl">
+    <div class="container">
+        <h1>ngPager</h1>
+        <p>修改自brantwills的<a href="https://github.com/brantwills/Angular-Paging" target="_blank">angular paging</a>，精简部分配置项，增加最大显示页码限制，和原插件逻辑不太一致</p>
+
+        <div class="well">
+            <form>
+                <h3>settings</h3>
+                <p>个人认为分页组件的配置项在初始化时指定一次就够了，所以并没有在指令内部监听settings的变化去重绘组件，为了演示效果，修改配置项后需要点击应用按钮才能触发组件重绘。</p>
+                <div class="row">
+                    <div class="col-md-3 col-sm-6">
+                        <div class="form-group">
+                            <label for="endPoint">endPoint</label>
+                            <input type="number" class="form-control" ng-model="options.endPoint" id="endPoint">
+                        </div>
+                        <div class="form-group">
+                            <label for="maxVisible">maxVisible</label>
+                            <input type="number" class="form-control" ng-model="options.maxVisible" id="maxVisible">
+                        </div>
+                        <div class="form-group">
+                            <div class="checkbox">
+                                <label>
+                                    <input type="checkbox" ng-model="options.showPrevNext">showPrevNext
+                                </label>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="checkbox">
+                                <label>
+                                    <input type="checkbox" ng-model="options.hideIfEmpty">hideIfEmpty
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-sm-6">
+                        <div class="form-group">
+                            <label for="ulClass">ulClass</label>
+                            <input type="text" class="form-control" ng-model="options.ulClass" id="ulClass">
+                        </div>
+                        <div class="form-group">
+                            <label for="dotsClass">dotsClass</label>
+                            <input type="text" class="form-control" ng-model="options.dotsClass" id="dotsClass">
+                        </div>
+                        <div class="form-group">
+                            <label for="disabledClass">disabledClass</label>
+                            <input type="text" class="form-control" ng-model="options.disabledClass" id="disabledClass">
+                        </div>
+                        <div class="form-group">
+                            <label for="activeClass">activeClass</label>
+                            <input type="text" class="form-control" ng-model="options.activeClass" id="activeClass">
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-sm-6">
+                        <div class="form-group">
+                            <label for="textDots">textDots</label>
+                            <input type="text" class="form-control" ng-model="options.textDots" id="textDots">
+                        </div>
+                        <div class="form-group">
+                            <label for="textPrev">textPrev</label>
+                            <input type="text" class="form-control" ng-model="options.textPrev" id="textPrev">
+                        </div>
+                        <div class="form-group">
+                            <label for="textNext">textNext</label>
+                            <input type="text" class="form-control" ng-model="options.textNext" id="textNext">
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-sm-6">
+                        <div class="form-group">
+                            <label for="textDotsClass">textDotsClass</label>
+                            <input type="text" class="form-control" ng-model="options.textDotsClass" id="textDotsClass">
+                        </div>
+                        <div class="form-group">
+                            <label for="textPrevClass">textPrevClass</label>
+                            <input type="text" class="form-control" ng-model="options.textPrevClass" id="textPrevClass">
+                        </div>
+                        <div class="form-group">
+                            <label for="textNextClass">textNextClass</label>
+                            <input type="text" class="form-control" ng-model="options.textNextClass" id="textNextClass">
+                        </div>
+                        <div class="form-group">
+                            <button class="btn btn-block btn-primary" ng-click="applyOptions()">应用配置</button>
+                        </div>
+                    </div>
+                </div>
+                <hr>
+                <p>以下属性任何一个变化都会引起组件重绘:</p>
+                <div class="row">
+                    <div class="col-md-4 col-sm-6">
+                        <div class="form-group">
+                            <label for="page">page</label>
+                            <input type="number" class="form-control" ng-model="demo.page" id="page">
+                        </div>
+                    </div>
+                    <div class="col-md-4 col-sm-6">
+                        <div class="form-group">
+                            <label for="pageSize">pageSize</label>
+                            <input type="number" class="form-control" ng-model="demo.pageSize" id="pageSize">
+                        </div>
+                    </div>
+                    <div class="col-md-4 col-sm-6">
+                        <div class="form-group">
+                            <label for="total">total</label>
+                            <input type="number" class="form-control" ng-model="demo.total" id="total">
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <div ng-if="showDemo">
+            <rx-pager page="demo.page" page-size="demo.pageSize" total="demo.total" paging-action="demo.action(page, pageSize, total)" settings="settings"></rx-pager>
+        </div>
+
+        <h3>属性</h3>
+        <table class="table table-bordered">
+            <tr>
+                <th width="20%">属性</th>
+                <th width="20%">默认值</th>
+                <th width="60%">描述</th>
+            </tr>
+            <tr>
+                <td><strong>{number}</strong> page</td>
+                <td>1</td>
+                <td>当前页码，从1开始计数。<br>当传入的页码小于1时，会被重置为1；<br>当页码大于总页码数时，会被重置为总页码数。</td>
+            </tr>
+            <tr>
+                <td><strong>{number}</strong> pageSize</td>
+                <td>10</td>
+                <td>每页显示条目数。</td>
+            </tr>
+            <tr>
+                <td><strong>{number}</strong> total</td>
+                <td>0</td>
+                <td>总条目数。</td>
+            </tr>
+            <tr>
+                <td><strong>{Function}</strong> pagingAction</td>
+                <td>null</td>
+                <td>分页函数。点击上一页、下一页、页码等会执行分页函数, 参数列表可有page, pageSize, total三个参数。通常在分页函数中执行异步请求，请求完成后重新给total,page赋值，触发组件重绘。</td>
+            </tr>
+            <tr>
+                <td><strong>{Object}</strong> settings</td>
+                <td>null</td>
+                <td>自定义配置项。具体参考配置项章节</td>
+            </tr>
+        </table>
+        <h3>配置项</h3>
+        <table class="table table-bordered">
+            <tr>
+                <th width="20%">属性</th>
+                <th width="20%">默认值</th>
+                <th width="60%">描述</th>
+            </tr>
+            <tr>
+                <td><strong>{number}</strong> endPoint</td>
+                <td>1</td>
+                <td>省略号两端的页码数。仅支持1,2,3</td>
+            </tr>
+            <tr>
+                <td><strong>{number}</strong> maxVisible</td>
+                <td>5</td>
+                <td>最多显示页码个数, 须满足maxVisible >= (3 + 2 * endPoint) 且 maxVisible <= 20 （人为限制，个人认为一个页面超出20个页码数就显得很没有意义了）</td>
+            </tr>
+            <tr>
+                <td><strong>{boolean}</strong> showPrevNext</td>
+                <td>true</td>
+                <td>是否显示上一页下一页。</td>
+            </tr>
+            <tr>
+                <td><strong>{boolean}</strong> hideIfEmpty</td>
+                <td>true</td>
+                <td>当总条目数为0时，是否隐藏分页组件。</td>
+            </tr>
+            <tr>
+                <td><strong>{string}</strong> ulClass</td>
+                <td>'pagination'</td>
+                <td>分页组件样式类。</td>
+            </tr>
+            <tr>
+                <td><strong>{string}</strong> dotsClass</td>
+                <td>'dots'</td>
+                <td>省略号样式类。可用于重置省略号按钮样式。</td>
+            </tr>
+            <tr>
+                <td><strong>{string}</strong> disabledClass</td>
+                <td>'disabled'</td>
+                <td>禁用状态样式类。</td>
+            </tr>
+            <tr>
+                <td><strong>{string}</strong> activeClass</td>
+                <td>'active'</td>
+                <td>激活状态样式类。</td>
+            </tr>
+            <tr>
+                <td><strong>{string}</strong> textDots</td>
+                <td>'...'</td>
+                <td>省略号文字。当设置了textDotsClass时会忽略该配置项。</td>
+            </tr>
+            <tr>
+                <td><strong>{string}</strong> textPrev</td>
+                <td>'上一页'</td>
+                <td>上一页文字。当设置了textPrevClass时会忽略该配置项。</td>
+            </tr>
+            <tr>
+                <td><strong>{string}</strong> textNext</td>
+                <td>'下一页'</td>
+                <td>下一页文字。当设置了textNextClass时会忽略该配置项。</td>
+            </tr>
+            <tr>
+                <td><strong>{string}</strong> textDotsClass</td>
+                <td>''</td>
+                <td>省略号文字样式类，通常用于字体图标代替文字显示。设置了该配置项会忽略textDots配置。</td>
+            </tr>
+            <tr>
+                <td><strong>{string}</strong> textPrevClass</td>
+                <td>''</td>
+                <td>上一页文字样式类，通常用于字体图标代替文字显示。设置了该配置项会忽略textPrev配置。</td>
+            </tr>
+            <tr>
+                <td><strong>{string}</strong> textNextClass</td>
+                <td>''</td>
+                <td>下一页文字样式类，通常用于字体图标代替文字显示。设置了该配置项会忽略textNext配置。</td>
+            </tr>
+        </table>
+    </div>
+    <script src="http://cdn.bootcss.com/angular.js/1.5.8/angular.min.js"></script>
+    <script src="pager.js"></script>
+    <script>
+    angular.module('myApp', ['rx.pager']).controller('myCtrl', ['$scope', '$timeout', function($scope, $timeout) {
+        $scope.demo = {
+            page: 3,
+            pageSize: 10,
+            total: 45,
+            action: function(page, pageSize, total) {
+                console.log({page: page, pageSize: pageSize, total: total});
+            }
+        };
+        $scope.options = {
+            'endPoint': 1,
+            'maxVisible': 5,
+            'showPrevNext': true,
+            'hideIfEmpty': true,
+            // text
+            'textDots': '...',
+            'textPrev': '上一页',
+            'textNext': '下一页',
+            // 一旦设置将覆盖text
+            'textDotsClass': '',
+            'textPrevClass': '',
+            'textNextClass': '',
+
+            'ulClass': 'pagination',
+            'dotsClass': 'dots',
+            'disabledClass': 'disabled',
+            'activeClass': 'active'
+        };
+
+        $scope.showDemo = true;
+        $scope.applyOptions = function() {
+            $scope.showDemo = false;
+            $scope.settings = angular.copy($scope.options);
+            $timeout(function() {
+                $scope.showDemo = true
+            });
+        };
+
+    }]);
+    </script>
+</body>
+</html>
