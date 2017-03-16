@@ -10,7 +10,7 @@
 
 **注意：** `maxVisible`不得小于 ` 2 * endPoint + 3`, 否则会忽略`maxVisible`设置，直接取`2*endPoint + 3`
 
-##典型用法##
+## 典型用法 ##
 
 [live demo及用法](http://xunqilong.com/ngPager/index.html)
 
