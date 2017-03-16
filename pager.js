@@ -79,14 +79,14 @@ angular.module('rx.pager', []).directive('rxPager', function () {
                             'data-ng-bind="Item.value">'+ 
                         '</a> ' +
                 '</li>' +
-            '</ul>' 
+            '</ul>';
     }
 
 
     function init(scope) {
     	var options = scope.options = angular.extend({}, {
-	        'endPoint': 1, // 列表两端页码个数,仅支持1-3
-	        'maxVisible': 5, //最多显示页码个数, 须满足maxVisible >= (3 + 2 * endPoint) && maxVisible <= 20
+	        'endPoint': 1, // 列表两端页码个数
+            'adjacent': 1, // 当前页相邻页码个数
 	        'showPrevNext': true,
 	        'hideIfEmpty': true,
 	        // text
@@ -104,22 +104,11 @@ angular.module('rx.pager', []).directive('rxPager', function () {
 	        'activeClass': 'active'
       	}, scope.settings);
 
-    	options.endPoint = parseInt(options.endPoint, 10) || 1;
-      	options.maxVisible = parseInt(options.maxVisible, 10) || 5;
+        options.endPoint = parseInt(options.endPoint, 10) || 1;
+        options.adjacent = parseInt(options.adjacent, 10) || 1;
 
-      	//页码列表两端页码数只能取[1, 2, 3]中的值
-      	if (options.endPoint < 1) {
-	        options.endPoint = 1;
-      	} else if (options.endPoint > 3) {
-	        options.endPoint = 3;
-      	}
-
-      	// maxVisible不小于 (2*endPoint + 3)，且不超过20(人为限制)
-      	if (options.maxVisible < 2 * options.endPoint + 3) {
-    		options.maxVisible = 2 * options.endPoint + 3;
-  		} else if (options.maxVisible > 20) {
-        	options.maxVisible = 20;
-      	}	
+        options.endPoint = options.endPoint < 1 ? 1 : options.endPoint;
+        options.adjacent = options.adjacent < 1 ? 1 : options.adjacent;
     }
 
     /**
@@ -190,7 +179,7 @@ angular.module('rx.pager', []).directive('rxPager', function () {
 
         // Ignore if we are not showing
         // or there are not more than maxVisible pages to display
-        if ((!options.showPrevNext) || scope.totalPages <= options.maxVisible) {
+        if ((!options.showPrevNext) || scope.totalPages <= 2 * (options.endPoint + options.adjacent) + 1) {
             return;
         }
 
@@ -320,13 +309,12 @@ angular.module('rx.pager', []).directive('rxPager', function () {
     function build(scope) {
         validateScopeValues(scope);
 
-        var start, finish;
-        var totalPages = scope.totalPages,
-        	page = scope.page,
-        	maxVisible = scope.options.maxVisible,
-        	endPoint,
-        	pad,
-        	adjacent;
+        var start, end,
+            totalPages = scope.totalPages,
+            page = scope.page,
+            endPoint = scope.options.endPoint,
+            adjacent = scope.options.adjacent,
+            maxVisible = 2 * (endPoint + adjacent) + 1; 
 
         // Add the Next and Previous buttons to our list
         addPrevNext(scope, 'prev');
@@ -336,20 +324,16 @@ angular.module('rx.pager', []).directive('rxPager', function () {
       	if (totalPages <= maxVisible) {
         	addRange(1, totalPages, scope);
       	} else {
-      		endPoint = scope.options.endPoint;
-            pad = (maxVisible - 1) % 2, //用于修正maxVisible为偶数时当前页右侧相邻页数
-            adjacent = (maxVisible - pad - 2 * endPoint - 1) / 2;
-
 	        // Determine if we are showing the beginning of the paging list
 	        if (page <= endPoint + adjacent + 1) {
 	          start = 1;
-	          end = endPoint + adjacent * 2 + 1 + pad;
+              end = page <= adjacent + 1 ? 2 * adjacent + 1 : page + adjacent;
 	          addRange(start, end, scope);
 	          addLast(scope, end);
 	        }
 	       // Determine if we are showing the end of the paging list
-	        else if (page >= totalPages - endPoint - adjacent - pad) {
-	          start = totalPages - 2 * adjacent - pad - endPoint;
+	        else if (page >= totalPages - endPoint - adjacent) {
+              start = page >= totalPages - adjacent ? totalPages - 2 * adjacent : page - adjacent;
 	          end = totalPages;
 	          addFirst(scope, start);
 	          addRange(start, end, scope);
@@ -357,7 +341,7 @@ angular.module('rx.pager', []).directive('rxPager', function () {
 	        // If nothing else we conclude we are at the middle of the paging list
 	        else {
 	          start = page - adjacent;
-	          end = page + adjacent + pad;
+	          end = page + adjacent;
 	          addFirst(scope, start);
 	          addRange(start, end, scope);
 	          addLast(scope, end);
