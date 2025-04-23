@@ -11,7 +11,7 @@
 
 ## 典型用法 ##
 
-[live demo及用法](/https://royxun.github.io/ngPager/index.html)
+[live demo及用法](https://royxun.github.io/ngPager/index.html)
 
 ```html
 <rx-pager page="page" page-size="pageSize" total="total" paging-action="paing(page, pageSize, total)"></rx-pager>
